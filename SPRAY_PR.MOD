@@ -151,22 +151,20 @@ lbChangeEnd:
   !Proc WaitWithCom
   !*************************************
   PROC WaitWithCom()
+    lbWaitForRotation:
     TPErase;
     PDispOff;
     Reset doTurbineY1;
     Reset doSprayY2;
     Reset doHighByteReadOK;
     Reset doLowByteReadOK;
-    Reset doDirectComOK;
-    !
+    Reset doDirectComOK;    
     MoveJ pWaitePos,v800,z20,tDuese;
     TPWrite " ";
     TPWrite " ";
     TPWrite string1;
-    WaitTime 0.1;
-    Set doRobotEndpos;
-    ! 
-    lbWaitForRotation:
+    WaitTime 0.1;    
+    Set doRobotEndpos;    
     WaitDI diMouldChange=1 OR diTableEndpos,0;
     IF diMouldChange=1 THEN
       mould_changeWithCom;
