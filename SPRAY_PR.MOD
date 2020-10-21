@@ -2,7 +2,6 @@
   VERSION:1
   LANGUAGE:ENGLISH
 %%%
-
 MODULE Spray_PR
   !********************************************
   ! Subject : Release agent spraying / for OS 3.0 
@@ -61,6 +60,92 @@ MODULE Spray_PR
   PROC StopSpray()
     SetDO\SDelay:=0.2,doSprayY2,0;
     SetDO\SDelay:=0.2,doTurbineY1,0;
+  ENDPROC
+
+!**************************************************
+!MouldChange with communication
+!**************************************************
+PROC mould_changeWithCom()
+lbMode:
+    Reset doRobotEndpos;
+    nMouldChange:=1;
+    TPErase;
+    !
+    TPWrite string30;
+    TPWrite " ";
+    TPWrite string31;
+    TPWrite " ";
+    TPWrite string32;
+    TPWrite string80;
+    TPWrite string33;
+    TPWrite " ";
+    TPReadFK nMode,string42,string49,string50,"","",string53;
+    !
+    TEST nMode
+    CASE 1:
+      TPErase;
+      !******************************** 
+      ! to Modul XXXX - program call 
+      ! based on contents of nPrg_Num 
+      !******************************** 
+      code_direct_com;
+      !
+      Reset doTurbineY1;
+      Reset doSprayY2;      
+      !X  Reset doOpenNozzle;
+      !X  Reset doSprayAir;
+      MoveJ pWaitePos,v2000,z20,tDuese;
+      TPErase;
+      !
+      GOTO lbMode;
+      !
+    CASE 2:
+      TPErase;
+      TPWrite string81;
+      TPWrite " ";
+      TPWrite string74;
+      TPWrite " ";
+      TPWrite " ";
+      TPWrite " ";
+      TPReadFK nKey,string42,string75,string76,"","",string21;
+      TEST nKey
+      CASE 1:
+        TPErase;
+        TPWrite " ";
+        TPWrite " ";
+        TPWrite string29;
+        WaitTime 2;
+        !
+      CASE 2:
+        TPErase;
+        TPWrite " ";
+        TPWrite string74;
+        TPWrite " ";
+        TPWrite string77;
+        TPWrite " ";
+        TPWrite string79;
+        TPWrite " ";
+        TPReadNum nNoSprayRotation,string78;
+        !
+      CASE 3,4,5:
+        TPErase;
+        GOTO lbMode;
+      ENDTEST
+      !
+    CASE 3,4,5:
+      TPErase;
+    ENDTEST
+    !************************
+    ! label change finish 
+    !************************
+lbChangeEnd:
+    TPErase;
+    TPWrite " ";
+    TPWrite string23;
+    WaitDI diMouldChange,0;
+    TPErase;
+  ERROR
+    RAISE;
   ENDPROC
 
   !Proc WaitWithCom
