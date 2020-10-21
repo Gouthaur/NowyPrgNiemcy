@@ -94,7 +94,7 @@ lbMode:
       Reset doSprayY2;      
       !X  Reset doOpenNozzle;
       !X  Reset doSprayAir;
-      MoveJ pWaitePos,v2000,z20,tDuese;
+      MoveJ pWaitePos,v1000,z20,tPistol;
       TPErase;
       !
       GOTO lbMode;
@@ -147,8 +147,9 @@ lbChangeEnd:
   ERROR
     RAISE;
   ENDPROC
-
+  !**************************************************************
   !Proc WaitWithCom
+  !*************************************
   PROC WaitWithCom()
     TPErase;
     PDispOff;
@@ -165,7 +166,12 @@ lbChangeEnd:
     WaitTime 0.1;
     Set doRobotEndpos;
     ! 
-    WaitDI diTableEndpos,0;
+    lbWaitForRotation:
+    WaitDI diMouldChange=1 OR diTableEndpos,0;
+    IF diMouldChange=1 THEN
+      mould_changeWithCom;
+      GOTO lbWaitForRotation;
+    ENDIF
     Set doAlarmLamp;
     TPErase;
     TPWrite " ";
@@ -231,8 +237,11 @@ lbChangeEnd:
     TPWrite " ";
     TPWrite " ";
     TPWrite string26\Num:=nPrg_Num;
+    Config_Off;
+    StartSpray;
     CallByVar "P",nPrg_Num;
-    !
+    StopSpray;
+    Config_On;
     RETURN;
     !
 lbWrongPrgNr:
